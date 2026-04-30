@@ -7,6 +7,7 @@ from ui.sliders import Slider
 class SettingsMenu:
     def __init__(self, switch_func):
         self.switch_screen = switch_func
+        self.return_to = "main"
 
         self.bg = load_image("main_menu_imgs/settings_bg.png", alpha=False, scale=(DESIGN_W, DESIGN_H))
         self.branch_img = load_image("main_menu_imgs/tree_branch.png")
@@ -40,7 +41,7 @@ class SettingsMenu:
             settings_state["sound_volume"] = self.sound_slider.value
 
             if self.back_btn.is_clicked(event):
-                self.switch_screen("main")
+                self.switch_screen(self.return_to)
 
     def draw(self):
         if self.bg: SCREEN.blit(self.bg, (0, 0))

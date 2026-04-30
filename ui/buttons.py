@@ -1,5 +1,5 @@
 import pygame
-from config import s_x, s_y, s_g, WIDTH, HEIGHT
+from config import s_x, s_y, s_g, WIDTH, HEIGHT, get_scaled_mouse_pos
 
 class ImageButton:
     def __init__(self, x, y, img, hover_img):
@@ -21,12 +21,23 @@ class ImageButton:
         self.hovered = False
 
     def update(self):
-        self.hovered = self.rect.collidepoint(pygame.mouse.get_pos())
+        mx, my = get_scaled_mouse_pos()
+        
+        if self.rect.collidepoint((mx, my)):
+            self.is_hovered = True
+        else:
+            self.is_hovered = False
 
     def draw(self, surface):
-        img_to_draw = self.hover_image if (self.hovered and self.hover_image) else self.image
+        img_to_draw = self.hover_image if (getattr(self, 'is_hovered', False) and self.hover_image) else self.image
         if img_to_draw:
             surface.blit(img_to_draw, self.rect)
 
     def is_clicked(self, event):
-        return event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.hovered
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.button == 1:
+                mx, my = get_scaled_mouse_pos()
+
+                if self.rect.collidepoint((mx, my)):
+                    return True
+        return False

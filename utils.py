@@ -9,7 +9,7 @@ def load_image(filename, alpha=True, scale=None, rotate=0):
         img = img.convert_alpha() if alpha else img.convert()
 
         if scale:
-            img = pygame.transform.smoothscale(img, (s_g(scale[0]), s_g(scale[1])))
+            img = pygame.transform.scale(img, (s_g(scale[0]), s_g(scale[1])))
         if rotate:
             img = pygame.transform.rotate(img, rotate)
         return img

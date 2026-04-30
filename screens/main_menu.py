@@ -1,6 +1,6 @@
 import pygame
 import sys
-from config import SCREEN, DESIGN_W, DESIGN_H, WIDTH, HEIGHT
+from config import SCREEN, DESIGN_W, DESIGN_H, WIDTH, HEIGHT, get_scaled_mouse_pos
 from utils import load_image
 from ui.buttons import ImageButton
 

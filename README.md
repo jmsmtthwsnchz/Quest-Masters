@@ -1,20 +1,6 @@
-# Desert Adventure: Pygame RPG
+# Quest-Masters
 
-A top-down 2D action game built with Python and Pygame. Explore an expansive desert ruins map, battle snakes and camels with a tactical slash attack, and survive the ancient tombs.
-
-## 🚀 Features
-
-- **Dynamic Camera System:** A smooth scrolling camera that follows the player through a massive, high-resolution world map.
-- **Combat System:** Tactical sword-slashing mechanics with custom hitbox logic (0.6 ratio) for precise gameplay.
-- **Smart Enemy AI:** Enemies feature patrol paths and "Zombie-style" chasing logic with reaction delays when the player is spotted.
-- **Animated Entities:** Fully animated player movement and enemy death sequences using sprite-sheet logic.
-- **Stage System:** Multiple difficulty levels (Easy, Medium, Hard) set within different sections of the ancient ruins.
-
-## 🛠️ Tech Stack
-
-- **Language:** Python 3.13+
-- **Library:** Pygame 2.6.1+
-- **Assets:** Custom pixel art sprites and PNG environmental textures.
+Quest Masters is a 2D medieval educational adventure game where players explore a mysterious kingdom filled with puzzles, enemies, and hidden items. The player must travel through different territories, solve puzzles, collect important items, and survive dangerous creatures in order to escape the kingdom.ancient tombs.
 
 ## 📦 Installation & Setup
 
