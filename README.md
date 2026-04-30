@@ -25,6 +25,11 @@ Quest Masters is a 2D medieval educational adventure game where players explore 
 
 ```
 ├── 📁 assets
+│   ├── 📁 items
+│   │   ├── 🖼️ boots.png
+│   │   ├── 🖼️ hat.png
+│   │   ├── 🖼️ potion.png
+│   │   └── 🖼️ scarf.png
 │   ├── 📁 main_menu_imgs
 │   │   ├── 🖼️ back.png
 │   │   ├── 🖼️ back_hover.png
@@ -141,6 +146,9 @@ Quest Masters is a 2D medieval educational adventure game where players explore 
 │       ├── 📁 environment
 │       │   ├── 🖼️ grass.png
 │       │   └── 🖼️ grass1.png
+│       ├── 📁 inventory_imgs
+│       │   ├── 🖼️ bag_icon.png
+│       │   └── 🖼️ slot_icon.png
 │       ├── 📁 slash
 │       │   ├── 🖼️ S1.png
 │       │   ├── 🖼️ S2.png
@@ -155,6 +163,8 @@ Quest Masters is a 2D medieval educational adventure game where players explore 
 ├── 📁 entities
 │   ├── 🐍 enemy.py
 │   └── 🐍 player.py
+├── 📁 logic
+│   └── 🐍 inventory.py
 ├── 📁 screens
 │   ├── 🐍 __init__.py
 │   ├── 🐍 game_screen.py
@@ -170,6 +180,8 @@ Quest Masters is a 2D medieval educational adventure game where players explore 
 ├── ⚙️ .gitignore
 ├── 📝 README.md
 ├── 🐍 config.py
+├── 🐍 item.py
 ├── 🐍 main.py
+├── 🐍 map_data.py
 └── 🐍 utils.py
 ```
