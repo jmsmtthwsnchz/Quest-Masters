@@ -7,10 +7,13 @@ from screens.settings import SettingsMenu
 from screens.level_select import LevelSelect
 from screens.game_screen import GameScreen
 from screens.splash_screen import SplashScreen
+from screens.char_select import CharacterSelect
+
 class App:
     def __init__(self):
         self.screens = {
             "splash": SplashScreen(self.switch_screen),
+            "char_select": CharacterSelect(self.switch_screen),
             "main": MainMenu(self.switch_screen),
             "settings": SettingsMenu(self.switch_screen),
             "level_select": LevelSelect(self.switch_screen),

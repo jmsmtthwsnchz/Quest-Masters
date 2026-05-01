@@ -25,10 +25,14 @@ class HealthBar(pygame.sprite.Sprite):
         # Top-Right corner positioning
         self.rect = self.image.get_rect(topright=(s_x(x), s_y(y)))
 
+    def update_visuals(self):
+        self.image = self.frames[self.hp_index]
+
     def take_damage(self):
         """Advances the health bar visually. Returns True if dead."""
         if self.hp_index < len(self.frames) - 1:
             self.hp_index += 1
             self.image = self.frames[self.hp_index]
+            self.update_visuals()
             return False 
         return True # Player has died!

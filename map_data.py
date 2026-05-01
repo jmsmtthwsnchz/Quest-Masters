@@ -292,7 +292,9 @@ STAGE_1_LEVEL_1_OBSTACLES = [
     pygame.Rect(3709, 432, 1, 3),
     pygame.Rect(3752, 470, 99, 264),
     pygame.Rect(3947, 648, 174, 137),
-    pygame.Rect(3932, 585, 191, 71)
+    pygame.Rect(3932, 585, 191, 71),
+    pygame.Rect(776, 492, 56, 182),
+    pygame.Rect(784, 678, 50, 56)
 ]
 
 STAGE_1_LEVEL_2_OBSTACLES = [
@@ -312,5 +314,5 @@ STAGE_2_LEVEL_2_OBSTACLES = [
 ]
 
 STAGE_2_LEVEL_3_OBSTACLES = [
-    
+
 ]

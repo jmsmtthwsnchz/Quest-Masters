@@ -44,7 +44,11 @@ class SplashScreen:
             self.alpha = max(0, 255 - (elapsed / self.fade_duration) * 255)
             if elapsed > self.fade_duration:
                 # Sequence finished! Move to character selection
-                self.switch_screen("main")
+                self.switch_screen("char_select")
+
+        for e in events:
+            if e.type == pygame.KEYDOWN or e.type == pygame.MOUSEBUTTONDOWN:
+                self.switch_screen("char_select")
 
     def draw(self):
         SCREEN.fill((0, 0, 0)) # Background is always black

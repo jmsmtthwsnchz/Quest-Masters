@@ -60,7 +60,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.topleft = (s_x(startx), s_y(starty))
 
         self.hitbox = pygame.Rect(0, 0, int(self.rect.width * 0.5), 20)
-        self.hitbox.midbottom = self.rect.midbottom
+        self.hitbox.midbottom = (self.rect.centerx, self.rect.bottom - 15)
 
         # Setup slash rect
         self.imageslash = self.LOADEDrSlash[0]
