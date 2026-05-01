@@ -92,18 +92,18 @@ class GameScreen:
         self.enemies_group = pygame.sprite.Group()
 
         from map_data import (
-            STAGE_1_LEVEL_1_OBSTACLES, STAGE_1_LEVEL_2_OBSTACLES, STAGE_1_LEVEL_3_OBSTACLES,
-            STAGE_2_LEVEL_1_OBSTACLES, STAGE_2_LEVEL_2_OBSTACLES, STAGE_2_LEVEL_3_OBSTACLES
+            STAGE_1_CHAPTER_1_OBSTACLES, STAGE_1_CHAPTER_2_OBSTACLES, STAGE_1_CHAPTER_3_OBSTACLES,
+            STAGE_2_CHAPTER_1_OBSTACLES, STAGE_2_CHAPTER_2_OBSTACLES, STAGE_2_CHAPTER_3_OBSTACLES
         )
         
         from config import DESIGN_W, DESIGN_H
         map_files = [
-            "resource/stg1level1map.png", "resource/stg1level2map.jpg", "resource/stg1level3map.jpg",
-            "resource/stg2level1map.png", "resource/stg2level2map.png", "resource/stg2level3map.png"
+            "resource/stg1chapter1map.png", "resource/stg1chapter2map.jpg", "resource/stg1chapter3map.jpg",
+            "resource/stg2chapter1map.png", "resource/stg2chapter2map.png", "resource/stg2chapterl3map.png"
         ]
         obstacle_sets = [
-            STAGE_1_LEVEL_1_OBSTACLES, STAGE_1_LEVEL_2_OBSTACLES, STAGE_1_LEVEL_3_OBSTACLES,
-            STAGE_2_LEVEL_1_OBSTACLES, STAGE_2_LEVEL_2_OBSTACLES, STAGE_2_LEVEL_3_OBSTACLES
+            STAGE_1_CHAPTER_1_OBSTACLES, STAGE_1_CHAPTER_2_OBSTACLES, STAGE_1_CHAPTER_3_OBSTACLES,
+            STAGE_2_CHAPTER_1_OBSTACLES, STAGE_2_CHAPTER_2_OBSTACLES, STAGE_2_CHAPTER_3_OBSTACLES
         ]
 
         idx = max(0, min(self.current_stage_idx, len(map_files) - 1))
@@ -226,7 +226,7 @@ class GameScreen:
             pygame.display.flip()
             pygame.time.delay(1500)
             self.reset()
-            self.switch_screen("level_select")
+            self.switch_screen("game_select")
             return
 
         taken_hits = [e for e in self.enemies_group if self.player.rect.inflate(-100, -100).colliderect(e.rect.inflate(-60, -60)) and not getattr(e, 'is_dying', False)]
@@ -269,7 +269,7 @@ class GameScreen:
                         self.switch_screen("settings", return_to="game")
                     if pygame.Rect(mid_x-110, mid_y+70, 220, 60).collidepoint((mx, my)):
                         self.reset()
-                        self.switch_screen("level_select")
+                        self.switch_screen("game_select")
 
                 elif self.show_inventory:
                     inv_rect = pygame.Rect(WIDTH // 2 - 400, HEIGHT // 2 - 300, 800, 600)
@@ -369,7 +369,7 @@ class GameScreen:
                     # Quit Button
                     if pygame.Rect(WIDTH//2 - 110, HEIGHT//2 + 80, 220, 60).collidepoint((mx, my)):
                         self.is_game_over = False
-                        self.switch_screen("level_select")
+                        self.switch_screen("game_select")
     def draw(self):
         from config import WIDTH, HEIGHT, get_scaled_mouse_pos
         mx, my = get_scaled_mouse_pos()

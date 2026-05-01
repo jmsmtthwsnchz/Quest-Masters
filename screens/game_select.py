@@ -4,7 +4,7 @@ from utils import load_image
 from ui.buttons import ImageButton
 from ui.portrait import PortraitBox
 
-class LevelSelect:
+class GameSelect:
     def __init__(self, switch_func, sound_manager=None):
         self.switch_screen = switch_func
         self.stage_data = []
@@ -174,9 +174,9 @@ class LevelSelect:
         SCREEN.blit(overlay, (0, 0))
 
         # Create/Draw buttons
-        self.easy_rect = self.draw_btn("Level 1", HEIGHT // 2 - 120, (50, 200, 50))
-        self.med_rect = self.draw_btn("Level 2", HEIGHT // 2, (200, 200, 50))
-        self.hard_rect = self.draw_btn("Level 3", HEIGHT // 2 + 120, (200, 50, 50))
+        self.easy_rect = self.draw_btn("Chapter 1", HEIGHT // 2 - 120, (50, 200, 50))
+        self.med_rect = self.draw_btn("Chapter 2", HEIGHT // 2, (200, 200, 50))
+        self.hard_rect = self.draw_btn("Chapter 3", HEIGHT // 2 + 120, (200, 50, 50))
 
     def draw_btn(self, text, y, color):
         from config import WHITE, s_x, s_y, s_g

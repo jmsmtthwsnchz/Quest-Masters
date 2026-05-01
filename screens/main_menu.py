@@ -23,7 +23,7 @@ class MainMenu:
         self.quit_btn.update()
         
         for e in events:
-            if self.start_btn.is_clicked(e): self.switch_screen("level_select")
+            if self.start_btn.is_clicked(e): self.switch_screen("game_select")
             if self.settings_btn.is_clicked(e): self.switch_screen("settings")
             if self.quit_btn.is_clicked(e):
                 pygame.quit()

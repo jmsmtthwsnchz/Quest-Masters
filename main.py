@@ -5,7 +5,7 @@ import os
 from config import CLOCK, FPS, settings_state, script_dir
 from screens.main_menu import MainMenu
 from screens.settings import SettingsMenu
-from screens.level_select import LevelSelect
+from screens.game_select import GameSelect
 from screens.game_screen import GameScreen
 from screens.splash_screen import SplashScreen
 from screens.char_select import CharacterSelect
@@ -24,7 +24,7 @@ class App:
             "cutscene": CutsceneScreen(self.switch_screen, self.sound_manager),
             "main": MainMenu(self.switch_screen, self.sound_manager),
             "settings": SettingsMenu(self.switch_screen, self.sound_manager),
-            "level_select": LevelSelect(self.switch_screen, self.sound_manager),
+            "game_select": GameSelect(self.switch_screen, self.sound_manager),
             "game": GameScreen(self.switch_screen, self.sound_manager)
         }
         self.current = "splash"
@@ -61,7 +61,7 @@ class App:
             pygame.mixer.music.stop()
 
         # If returning to menus from the game, switch back to menu music
-        elif prev_screen == "game" and name in ["main", "level_select"]:
+        elif prev_screen == "game" and name in ["main", "game_select"]:
             self.sound_manager.play_music(self.sound_manager.menu_music, settings_state["music_volume"])
             
         # If arriving at the main menu from character selection, start menu music
@@ -88,7 +88,7 @@ class App:
                         sys.exit()
                     elif self.current == "settings":
                         self.switch_screen(self.screens["settings"].return_to)
-                    elif self.current == "level_select":
+                    elif self.current == "game_select":
                         self.current = "main"
                     elif self.current == "game":
                         pass

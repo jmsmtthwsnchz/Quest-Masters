@@ -168,7 +168,7 @@ Quest Masters is a 2D medieval educational adventure game where players explore 
 ├── 📁 screens
 │   ├── 🐍 __init__.py
 │   ├── 🐍 game_screen.py
-│   ├── 🐍 level_select.py
+│   ├── 🐍 game_select.py
 │   ├── 🐍 main_menu.py
 │   └── 🐍 settings.py
 ├── 📁 ui
