@@ -6,16 +6,17 @@ from screens.main_menu import MainMenu
 from screens.settings import SettingsMenu
 from screens.level_select import LevelSelect
 from screens.game_screen import GameScreen
-
+from screens.splash_screen import SplashScreen
 class App:
     def __init__(self):
         self.screens = {
+            "splash": SplashScreen(self.switch_screen),
             "main": MainMenu(self.switch_screen),
             "settings": SettingsMenu(self.switch_screen),
             "level_select": LevelSelect(self.switch_screen),
             "game": GameScreen(self.switch_screen)
         }
-        self.current = "main"
+        self.current = "splash"
 
     def switch_screen(self, name, **kwargs):
         # 1. Save the PREVIOUS screen before changing current
