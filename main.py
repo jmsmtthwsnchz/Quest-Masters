@@ -17,11 +17,18 @@ class App:
         }
         self.current = "main"
 
-    def switch_screen(self, name):
+    def switch_screen(self, name, **kwargs):
+        # 1. Save the PREVIOUS screen before changing current
         if name == "settings":
             self.screens["settings"].return_to = self.current
-            
+        
+        # 2. Now update to the new screen
         self.current = name
+        
+        if hasattr(self.screens[self.current], 'reset'):
+            self.screens[self.current].reset(**kwargs)
+        elif self.current == "settings":
+            self.switch_screen(self.screens["settings"].return_to)
 
     def run(self):
         import config
@@ -35,8 +42,12 @@ class App:
                     if self.current == "main":
                         pygame.quit()
                         sys.exit()
-                    elif self.current != "game":
+                    elif self.current == "settings":
+                        self.switch_screen(self.screens["settings"].return_to)
+                    elif self.current == "level_select":
                         self.current = "main"
+                    elif self.current == "game":
+                        pass
                 elif e.type == pygame.VIDEORESIZE:
                     config.WINDOW = pygame.display.set_mode(
                         (e.w, e.h),

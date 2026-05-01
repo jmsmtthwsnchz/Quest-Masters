@@ -4,13 +4,32 @@ from config import s_x, s_y, s_g
 from logic.inventory import Inventory
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, startx, starty):
+    def __init__(self, startx, starty, gender="male"):
         super().__init__()
         
-        self.CLEFT = [load_image(f"resource/character/movement/l{i}.png", scale=(145, 145)) for i in range(1, 5)]
-        self.CRIGHT = [load_image(f"resource/character/movement/r{i}.png", scale=(145, 145)) for i in range(1, 5)]
-        self.CUP = [load_image(f"resource/character/movement/u{i}.png", scale=(145, 145)) for i in range(1, 5)]
-        self.CDOWN = [load_image(f"resource/character/movement/d{i}.png", scale=(145, 145)) for i in range(1, 5)]
+        self.gender = gender
+        
+        self.CLEFT = [load_image(f"resource/character/movement/{self.gender}/l{i}.png", scale=(145, 145)) for i in range(1, 5)]
+        self.CRIGHT = [load_image(f"resource/character/movement/{self.gender}/r{i}.png", scale=(145, 145)) for i in range(1, 5)]
+        self.CUP = [load_image(f"resource/character/movement/{self.gender}/u{i}.png", scale=(145, 145)) for i in range(1, 5)]
+        self.CDOWN = [load_image(f"resource/character/movement/{self.gender}/d{i}.png", scale=(145, 145)) for i in range(1, 5)]
+
+        self.LOADEDrSlash = []
+        self.LOADEDlSlash = []
+        for i in range(1, 7):
+            r_img = load_image(f"resource/character/slash/{self.gender}/atk{i}.png", scale=(135, 135))
+            l_img = load_image(f"resource/character/slash/{self.gender}/atk{i}L.png", scale=(135, 135))
+            if r_img: self.LOADEDrSlash.append(r_img)
+            if l_img: self.LOADEDlSlash.append(l_img) 
+
+        if not self.LOADEDrSlash:
+            fallback = pygame.Surface((150, 150))
+            fallback.fill((255, 255, 0))
+            self.LOADEDrSlash = [fallback] * 6
+            self.LOADEDlSlash = [fallback] * 6
+
+        self.slashframe = 0
+        self.slashing = False
 
         # Movement State
         self.movingleft = False
@@ -18,22 +37,9 @@ class Player(pygame.sprite.Sprite):
         self.movingup = False
         self.movingdown = False
         self.moveframe = 0
-
-        # Slash State
-        self.SCALEDLOADEDSLASH = []
-        for i in range(1, 9):
-            img = load_image(f"resource/slash/S{i}.png", scale=(135, 135))
-            if img:
-                self.SCALEDLOADEDSLASH.append(img)
-                
-        if not self.SCALEDLOADEDSLASH:
-            print("WARNING: Slash images missing! Using yellow box.")
-            fallback = pygame.Surface((150, 150))
-            fallback.fill((255, 255, 0)) 
-            self.SCALEDLOADEDSLASH = [fallback] * 8 
-
         self.slashframe = 0
         self.slashing = False
+        self.last_direction = "DOWN"
 
         # Animation Speeds
         self.slashanimation_speed = 3
@@ -41,30 +47,30 @@ class Player(pygame.sprite.Sprite):
         self.moveanimation_speed = 10
         self.moveanimation_time = 0
 
+        self.last_hit_time = 0
+        self.invulnerability_duration = 2000
+        self.is_invulnerable = False
+        self.visible = True
+        self.flicker_timer = 0
+        self.flicker_speed = 10
+
         # Set starting image and rect
         self.image = self.CDOWN[0] 
         self.rect = self.image.get_rect()
         self.rect.topleft = (s_x(startx), s_y(starty))
 
-        self.inventory = Inventory(size=12)
-
-        # Create the Hitbox (Using the Full Body style or Boots style)
-        #self.hitbox = pygame.Rect(0, 0, int(self.rect.width * 0.5), int(self.rect.height * 0.8))
-        #self.hitbox.midbottom = self.rect.midbottom
         self.hitbox = pygame.Rect(0, 0, int(self.rect.width * 0.5), 20)
         self.hitbox.midbottom = self.rect.midbottom
 
         # Setup slash rect
-        self.imageslash = self.SCALEDLOADEDSLASH[0]
+        self.imageslash = self.LOADEDrSlash[0]
         self.slashrect = self.imageslash.get_rect()
 
-        self.last_direction = "DOWN"
         self.speed = s_g(4)
-
         self.is_dead = False
+        self.inventory = Inventory(size=12)
 
     def update(self, *args):
-        self.handle_input()
         self.movementanimation()
         self.attackanimation()
 
@@ -140,13 +146,28 @@ class Player(pygame.sprite.Sprite):
         if mouse[0] and not self.slashing:
             self.slashing = True
             self.slashframe = 0
-            self.animation_timer = 0 
-            self.imageslash = self.SCALEDLOADEDSLASH[0] 
+            self.animation_timer = 0
+
+            if self.last_direction == "LEFT":
+                self.imageslash = self.LOADEDlSlash[0]
+            else:
+                self.imageslash = self.LOADEDrSlash[0]
             self.slashrect.center = self.rect.center
 
     def movementanimation(self):
         if self.is_dead:
             return
+        
+        current_time = pygame.time.get_ticks()
+        if current_time - self.last_hit_time < self.invulnerability_duration:
+            self.flicker_timer += 1
+            if self.flicker_timer >= self.flicker_speed:
+                self.visible = not self.visible
+                self.flicker_timer = 0
+            self.image.set_alpha(255 if self.visible else 100)
+        else:
+            self.image.set_alpha(255)
+            self.visible = True
         
         if self.movingleft or self.movingright or self.movingup or self.movingdown:
             self.moveanimation_time += 1
@@ -174,11 +195,14 @@ class Player(pygame.sprite.Sprite):
                 self.animation_timer = 0
                 self.slashframe += 1
 
-                if self.slashframe >= len(self.SCALEDLOADEDSLASH):
+                if self.slashframe >= len(self.LOADEDrSlash):
                     self.slashing = False
                     self.slashframe = 0 
                 else:
-                    self.imageslash = self.SCALEDLOADEDSLASH[self.slashframe]
+                    if self.last_direction == "LEFT":
+                        self.imageslash = self.LOADEDlSlash[self.slashframe]
+                    else:
+                        self.imageslash = self.LOADEDrSlash[self.slashframe]
 
     def shadow(self):
         shadow = pygame.Surface(self.image.get_size(), pygame.SRCALPHA)

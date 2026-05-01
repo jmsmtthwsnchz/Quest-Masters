@@ -40,6 +40,8 @@ class PortraitBox:
         
         temp = pygame.transform.smoothscale(self.image, (sw, sh))
         temp.set_alpha(int(self.curr_alpha))
-        rect = temp.get_rect(center=(int(self.curr_x), HEIGHT // 2))
         
-        surface.blit(temp, rect)
+        # SAVE THE RECT: Change 'rect =' to 'self.rect ='
+        self.rect = temp.get_rect(center=(int(self.curr_x), HEIGHT // 2))
+        
+        surface.blit(temp, self.rect)

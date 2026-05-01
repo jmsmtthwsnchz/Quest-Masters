@@ -1,6 +1,6 @@
 import pygame
 
-STAGE_1_OBSTACLES = [
+STAGE_1_LEVEL_1_OBSTACLES = [
     pygame.Rect(1120, 1008, 751, 253),
     pygame.Rect(2146, 1005, 979, 242),
     pygame.Rect(3122, 748, 89, 468),
@@ -293,4 +293,24 @@ STAGE_1_OBSTACLES = [
     pygame.Rect(3752, 470, 99, 264),
     pygame.Rect(3947, 648, 174, 137),
     pygame.Rect(3932, 585, 191, 71)
+]
+
+STAGE_1_LEVEL_2_OBSTACLES = [
+
+]
+
+STAGE_1_LEVEL_3_OBSTACLES = [
+
+]
+
+STAGE_2_LEVEL_1_OBSTACLES = [
+
+]
+
+STAGE_2_LEVEL_2_OBSTACLES = [
+
+]
+
+STAGE_2_LEVEL_3_OBSTACLES = [
+    
 ]

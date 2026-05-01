@@ -34,10 +34,9 @@ class ImageButton:
             surface.blit(img_to_draw, self.rect)
 
     def is_clicked(self, event):
-        if event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1:
-                mx, my = get_scaled_mouse_pos()
-
-                if self.rect.collidepoint((mx, my)):
-                    return True
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            mx, my = get_scaled_mouse_pos()
+            
+            if self.rect.collidepoint((mx, my)):
+                return True
         return False

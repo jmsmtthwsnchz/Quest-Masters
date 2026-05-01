@@ -1,5 +1,6 @@
 # entities/enemy.py
 import pygame
+import random
 from utils import load_image
 from config import s_x, s_y, s_g
 
@@ -22,7 +23,7 @@ class Creature(pygame.sprite.Sprite):
                 if img:
                     self.animations[action].append(img)
         
-        # Fallback if images fail to load (draws a red square so you can still test)
+        # Fallback if images fail to load
         if self.animations[self.direction]:
             self.image = self.animations[self.direction][0]
         else:
@@ -31,10 +32,13 @@ class Creature(pygame.sprite.Sprite):
             
         self.rect = self.image.get_rect(center=(s_x(x), s_y(y)))
 
-        # 2. Patrol logic variables
-        self.start_x = self.rect.x
-        self.end_x = self.rect.x + s_x(patrol_distance)
-        self.target_x = self.end_x
+        self.hitbox = pygame.Rect(0, 0, int(self.rect.width * 0.5), 20)
+        self.hitbox.midbottom = self.rect.midbottom
+
+        # 2. Random Roaming logic variables
+        self.roam_timer = 0
+        self.roam_dx = 0
+        self.roam_dy = 0
 
         self.anim_timer = 0
         self.anim_speed = 5
@@ -49,7 +53,10 @@ class Creature(pygame.sprite.Sprite):
         self.reaction_timer = 0
         self.has_spotted_player = False
 
-    def update(self, player):
+    def update(self, player, obstacles=None):
+        if obstacles is None:
+            obstacles = []
+
         if self.is_dying:
             if self.animations["DEATH"]:
                 self.death_timer += 1
@@ -63,15 +70,14 @@ class Creature(pygame.sprite.Sprite):
                         self.image = self.animations["DEATH"][self.death_frame]
             else:
                 self.kill()
-
             return
         
-        #Calculate distance to player
+        # Calculate distance to player
         dx = player.rect.centerx - self.rect.centerx
         dy = player.rect.centery - self.rect.centery
         distance = (dx**2 + dy**2)**0.5
         
-        #State logic detect pleyer
+        # State logic detect player
         if distance < self.detection_radius:
             if not self.has_spotted_player:
                 self.has_spotted_player = True
@@ -85,30 +91,62 @@ class Creature(pygame.sprite.Sprite):
             self.is_chasing = False
             self.has_spotted_player = False
 
-        #Movement Logic
+        # --- INTENDED MOVEMENT CALCULATION ---
+        dx_move = 0
+        dy_move = 0
+
         if self.is_chasing:
             if distance > self.attack_range:
                 if distance != 0:
-                    self.rect.x += (dx / distance) * self.speed
-                    self.rect.y += (dy / distance) * self.speed
+                    dx_move = (dx / distance) * self.speed
+                    dy_move = (dy / distance) * self.speed
 
                 if abs(dx) > abs(dy):
                     self.direction = "RIGHT" if dx > 0 else "LEFT"
                 else:
                     self.direction = "DOWN" if dy > 0 else "UP"
         else:
-            # Move towards the target
-            if self.rect.x < self.target_x:
-                self.rect.x += self.speed
-                self.direction = "RIGHT"
-            elif self.rect.x > self.target_x:
-                self.rect.x -= self.speed
-                self.direction = "LEFT"
+            # --- NEW RANDOM ROAMING LOGIC ---
+            self.roam_timer -= 1
+            if self.roam_timer <= 0:
+                # Pick a new random direction and walk for 1 to 3 seconds (60 to 180 frames)
+                self.roam_timer = random.randint(60, 180) 
+                
+                # Pick a random velocity for X and Y (-speed, 0, or +speed)
+                self.roam_dx = random.choice([-self.speed, 0, self.speed])
+                self.roam_dy = random.choice([-self.speed, 0, self.speed])
+                
+            dx_move = self.roam_dx
+            dy_move = self.roam_dy
 
-            # Turn around if we reached the patrol point
-            if abs(self.rect.x - self.target_x) <= self.speed:
-                self.target_x = self.start_x if self.target_x == self.end_x else self.end_x
-            pass
+            # Set animation facing based on the random direction
+            if abs(dx_move) > abs(dy_move):
+                self.direction = "RIGHT" if dx_move > 0 else "LEFT"
+            elif dy_move != 0:
+                self.direction = "DOWN" if dy_move > 0 else "UP"
+
+        # --- APPLY X MOVEMENT & WALL COLLISIONS ---
+        if dx_move != 0:
+            self.hitbox.x += dx_move
+            for wall in obstacles:
+                if self.hitbox.colliderect(wall):
+                    if dx_move > 0:
+                        self.hitbox.right = wall.left
+                    elif dx_move < 0:
+                        self.hitbox.left = wall.right
+
+        # --- APPLY Y MOVEMENT & WALL COLLISIONS ---
+        if dy_move != 0:
+            self.hitbox.y += dy_move
+            for wall in obstacles:
+                if self.hitbox.colliderect(wall):
+                    if dy_move > 0:
+                        self.hitbox.bottom = wall.top
+                    elif dy_move < 0:
+                        self.hitbox.top = wall.bottom
+
+        # --- GLUE VISUAL SPRITE TO HITBOX ---
+        self.rect.midbottom = self.hitbox.midbottom
 
         # Animate walking
         if self.animations[self.direction]:
@@ -129,8 +167,7 @@ class Creature(pygame.sprite.Sprite):
     
     def shadow(self):
         shadow = pygame.Surface(self.image.get_size(), pygame.SRCALPHA)
-
         shadow.fill((0,0,0, 100))
-
-        shadow.blit(self.iamge, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+        # Fixed a tiny typo here from your original file: self.iamge -> self.image
+        shadow.blit(self.image, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
         return shadow

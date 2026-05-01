@@ -30,6 +30,9 @@ class SettingsMenu:
         )
         self.back_btn = ImageButton(100, 800, back_img, back_hover)
 
+    def reset(self, **kwargs):
+        pass
+
     def update(self, events):
         self.back_btn.update()
         
