@@ -5,7 +5,7 @@ from utils import load_image
 from ui.buttons import ImageButton
 
 class MainMenu:
-    def __init__(self, switch_func):
+    def __init__(self, switch_func, sound_manager=None):
         self.switch_screen = switch_func
 
         self.bg = load_image("main_menu_imgs/main_menu_bg.png", alpha=False, scale=(DESIGN_W, DESIGN_H))

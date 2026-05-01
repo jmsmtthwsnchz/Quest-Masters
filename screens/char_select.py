@@ -39,9 +39,9 @@ class CharacterSelect:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 # Clicking the box selects the character and starts the game
                 if male_rect.collidepoint((mx, my)):
-                    self.switch_screen("game", char_type="percival", stage_index=0)
+                    self.switch_screen("cutscene", char_type="percival", stage_index=0)
                 elif female_rect.collidepoint((mx, my)):
-                    self.switch_screen("game", char_type="celena", stage_index=0)
+                    self.switch_screen("cutscene", char_type="celena", stage_index=0)
 
     def draw(self):
         from config import get_scaled_mouse_pos

@@ -1,34 +1,74 @@
 import pygame
 import sys
 import config
-from config import CLOCK, FPS
+import os
+from config import CLOCK, FPS, settings_state, script_dir
 from screens.main_menu import MainMenu
 from screens.settings import SettingsMenu
 from screens.level_select import LevelSelect
 from screens.game_screen import GameScreen
 from screens.splash_screen import SplashScreen
 from screens.char_select import CharacterSelect
+from screens.cutscene import CutsceneScreen
+from sound_manager import SoundManager
+
+pygame.init()
+pygame.mixer.init()
 
 class App:
     def __init__(self):
+        self.sound_manager = SoundManager()
         self.screens = {
             "splash": SplashScreen(self.switch_screen),
             "char_select": CharacterSelect(self.switch_screen),
-            "main": MainMenu(self.switch_screen),
-            "settings": SettingsMenu(self.switch_screen),
-            "level_select": LevelSelect(self.switch_screen),
-            "game": GameScreen(self.switch_screen)
+            "cutscene": CutsceneScreen(self.switch_screen, self.sound_manager),
+            "main": MainMenu(self.switch_screen, self.sound_manager),
+            "settings": SettingsMenu(self.switch_screen, self.sound_manager),
+            "level_select": LevelSelect(self.switch_screen, self.sound_manager),
+            "game": GameScreen(self.switch_screen, self.sound_manager)
         }
         self.current = "splash"
 
+        default_bg_path = os.path.join(script_dir, "assets", "sounds", "default_bg.mp3")
+        try:
+            pygame.mixer.music.load(default_bg_path)
+            pygame.mixer.music.set_volume(settings_state["music_volume"])
+            pygame.mixer.music.play(-1)
+        except pygame.error:
+            print(f"Initial music load failed. Check: {default_bg_path}")
+
     def switch_screen(self, name, **kwargs):
-        # 1. Save the PREVIOUS screen before changing current
+        # 1. Remember where we came from
+        prev_screen = self.current
+        
         if name == "settings":
             self.screens["settings"].return_to = self.current
-        
-        # 2. Now update to the new screen
+
+        # 2. Update to the new screen
         self.current = name
-        
+
+        # --- MUSIC LOGIC START ---
+        # Stop the intro music when moving from splash to char_select
+
+        import pygame # Ensure pygame is imported if not globally available
+        if prev_screen == "splash" and name == "char_select":
+            import pygame 
+            pygame.mixer.music.fadeout(1000) 
+
+        # FIX: Instantly kill all background music when a cutscene starts
+        elif name == "cutscene":
+            import pygame
+            pygame.mixer.music.stop()
+
+        # If returning to menus from the game, switch back to menu music
+        elif prev_screen == "game" and name in ["main", "level_select"]:
+            self.sound_manager.play_music(self.sound_manager.menu_music, settings_state["music_volume"])
+            
+        # If arriving at the main menu from character selection, start menu music
+        elif prev_screen == "char_select" and name == "main":
+            self.sound_manager.play_music(self.sound_manager.menu_music, settings_state["music_volume"])        # --- MUSIC LOGIC END ---
+
+        # 3. Trigger resets
         if hasattr(self.screens[self.current], 'reset'):
             self.screens[self.current].reset(**kwargs)
         elif self.current == "settings":

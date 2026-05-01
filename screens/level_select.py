@@ -1,11 +1,11 @@
 import pygame
-from config import SCREEN, DESIGN_W, DESIGN_H, WIDTH, HEIGHT
+from config import SCREEN, DESIGN_W, DESIGN_H, WIDTH, HEIGHT, s_x, s_y, s_g
 from utils import load_image
 from ui.buttons import ImageButton
 from ui.portrait import PortraitBox
 
 class LevelSelect:
-    def __init__(self, switch_func):
+    def __init__(self, switch_func, sound_manager=None):
         self.switch_screen = switch_func
         self.stage_data = []
 
@@ -22,7 +22,7 @@ class LevelSelect:
         # UI Elements
         back_img = load_image("main_menu_imgs/back.png", scale=(450, 180), rotate=-3)
         back_hover = load_image("main_menu_imgs/back_hover.png", scale=(450, 180), rotate=-3)
-        self.back_btn = ImageButton(50, 50, back_img, back_hover)
+        self.back_btn = ImageButton(s_x(50), s_y(50), back_img, back_hover)
 
         # State Variables
         self.last_move_time = 0
@@ -153,7 +153,11 @@ class LevelSelect:
         if self.is_zooming:
             portrait = self.stage_data[self.selected_stage_idx]["portrait"]
             w, h = portrait.get_size()
-            temp = pygame.transform.smoothscale(portrait, (int(w * self.zoom_scale), int(h * self.zoom_scale)))
+
+            target_w = int(s_g(w) * self.zoom_scale)
+            target_h = int(s_g(h) * self.zoom_scale)
+
+            temp = pygame.transform.smoothscale(portrait, (target_w, target_h))
             temp.set_alpha(int(self.zoom_alpha))
             rect = temp.get_rect(center=(WIDTH // 2, HEIGHT // 2))
             SCREEN.blit(temp, rect)
@@ -175,13 +179,15 @@ class LevelSelect:
         self.hard_rect = self.draw_btn("Level 3", HEIGHT // 2 + 120, (200, 50, 50))
 
     def draw_btn(self, text, y, color):
-        from config import WHITE
+        from config import WHITE, s_x, s_y, s_g
         font = pygame.font.SysFont("Arial", 50, bold=True)
         surf = font.render(text, True, WHITE)
+
         rect = surf.get_rect(center=(WIDTH // 2, y))
         box = rect.inflate(60, 30)
-        pygame.draw.rect(SCREEN, color, box, border_radius=15)
-        pygame.draw.rect(SCREEN, WHITE, box, 3, border_radius=15)
+
+        pygame.draw.rect(SCREEN, color, box, border_radius=s_g(15))
+        pygame.draw.rect(SCREEN, WHITE, box, s_g(3), border_radius=s_g(15))
         SCREEN.blit(surf, rect)
         return box
  

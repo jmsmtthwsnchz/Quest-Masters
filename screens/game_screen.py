@@ -1,13 +1,15 @@
 import pygame
 import random
-from config import SCREEN, BLACK, WHITE, s_g
+import os
+from config import SCREEN, BLACK, WHITE, s_g, script_dir
 from utils import load_image
 from entities.player import Player
 from entities.enemy import Creature
 from ui.health import HealthBar
+from screens.settings import settings_state
 
 class GameScreen:
-    def __init__(self, switch_func):
+    def __init__(self, switch_func, sound_manager=None):
         self.switch_screen = switch_func
         self.current_stage_idx = 0
         self.current_difficulty = None
@@ -35,12 +37,30 @@ class GameScreen:
             if alpha > 255: alpha = 255
             pygame.draw.circle(self.vignette, (0, 0, 0, alpha), (center_x, center_y), r)
 
+        
+        self.sound_manager = sound_manager
         self.reset()
 
     def reset(self, stage_index=None, difficulty=None, char_type=None, **kwargs):
+
+        if stage_index is None and difficulty is None and char_type is None and getattr(self, 'player', None) is not None:
+            self.is_paused = False
+            self.show_system_menu = False
+            return
+
+        idx = stage_index if stage_index is not None else self.current_stage_idx
+        pygame.mixer.music.stop()
+        track_name = "desert_ambient.mp3" if idx == 0 else "default_bg.mp3"
+        full_track_path = os.path.join(self.sound_manager.path, track_name)
+
+        try:
+            self.sound_manager.play_music(full_track_path, settings_state["music_volume"])
+        except Exception as e:
+            print(f"could not load music: {e}")
+
         old_inventory = None
         old_hotbar = None
-        
+
         self.all_sprites = pygame.sprite.Group()
         self.enemies_group = pygame.sprite.Group()
 
@@ -119,9 +139,15 @@ class GameScreen:
         self.offset_x = self.offset_y = 0
         self.is_paused = self.show_system_menu = self.show_inventory = self.dev_drawing = False
 
+        if stage_index is not None or char_type is not None:
+            try:
+                self.sound_manager.play_sfx("start")
+            except AttributeError:
+                pass
+
     def update(self, events):
         now = pygame.time.get_ticks()
-
+        
         for event in events:
             if event.type == pygame.KEYDOWN:
                 # Hotbar Inputs (1, 2, 3)[cite: 7]
@@ -146,6 +172,12 @@ class GameScreen:
                             break
                     if not added:
                         self.player.inventory.add_item(new_item)
+                if event.key == pygame.K_k:
+                    self.trigger_slash()
+
+                if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    if not self.is_paused:
+                        self.trigger_slash()
 
                 if event.key == pygame.K_ESCAPE:
                     self.show_system_menu = not self.show_system_menu
@@ -234,7 +266,7 @@ class GameScreen:
                         self.show_system_menu = False
                         self.is_paused = False
                     if pygame.Rect(mid_x-110, mid_y-30, 220, 60).collidepoint((mx, my)):
-                        self.switch_screen("settings")
+                        self.switch_screen("settings", return_to="game")
                     if pygame.Rect(mid_x-110, mid_y+70, 220, 60).collidepoint((mx, my)):
                         self.reset()
                         self.switch_screen("level_select")
@@ -463,3 +495,14 @@ class GameScreen:
         pygame.draw.rect(SCREEN, color, btn_rect, border_radius=5)
         text_surf = pygame.font.SysFont("Arial", 30, bold=True).render(text, True, WHITE)
         SCREEN.blit(text_surf, text_surf.get_rect(center=(x, y)))
+
+    def play_slash_sfx(self):
+        self.sfx_slash.set_volume(settings_state["sound_volume"])
+        self.sfx_slash.play()
+    
+    def trigger_slash(self):
+        if not self.player.slashing:
+            self.player.slashing = True
+            self.player.slashframe = 0
+            
+            self.sound_manager.play_sfx("slash")

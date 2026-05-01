@@ -5,9 +5,10 @@ from ui.buttons import ImageButton
 from ui.sliders import Slider
 
 class SettingsMenu:
-    def __init__(self, switch_func):
+    def __init__(self, switch_func, sound_manager=None):
         self.switch_screen = switch_func
         self.return_to = "main"
+        self.sound_manager = sound_manager
 
         self.bg = load_image("main_menu_imgs/settings_bg.png", alpha=False, scale=(DESIGN_W, DESIGN_H))
         self.branch_img = load_image("main_menu_imgs/tree_branch.png")
@@ -31,7 +32,7 @@ class SettingsMenu:
         self.back_btn = ImageButton(100, 800, back_img, back_hover)
 
     def reset(self, **kwargs):
-        pass
+        self.return_to = kwargs.get("return_to", "main")
 
     def update(self, events):
         self.back_btn.update()
@@ -40,8 +41,13 @@ class SettingsMenu:
             self.music_slider.handle_event(event)
             self.sound_slider.handle_event(event)
 
+            if event.type == pygame.MOUSEMOTION and (self.music_slider.dragging or self.sound_slider.dragging):
+                pygame.mixer.music.set_volume(self.music_slider.value)
+            
             settings_state["music_volume"] = self.music_slider.value
             settings_state["sound_volume"] = self.sound_slider.value
+
+            pygame.mixer.music.set_volume(settings_state["music_volume"])
 
             if self.back_btn.is_clicked(event):
                 self.switch_screen(self.return_to)

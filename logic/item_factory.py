@@ -1,10 +1,14 @@
+import pygame
+import os
 from logic.item import Item # Assuming you have an Item class
 from utils import load_image
+from config import script_dir
 
 def create_test_item(health_bar):
     img = load_image("resource/inventory_imgs/cactus_fruit.jpg", scale=(70, 70))
     
     def heal_effect(target):
+        heal_sfx_path = os.path.join(script_dir, "assets", "sounds", "heal_chime.wav")
         if health_bar.hp_index > 0:
             health_bar.hp_index -= 1
             # NEW: Sync the visual image with the new index
@@ -12,6 +16,12 @@ def create_test_item(health_bar):
                 health_bar.update_visuals()
                 
             print(f"Healed! Current HP Index: {health_bar.hp_index}")
+
+            try:
+                pygame.mixer.Sound(heal_sfx_path).play()
+            except Exception as e:
+                print(f"Heal SFX error: {e}")
+
             return True 
         return False 
 
